@@ -658,22 +658,34 @@ def regional_bottlenecks(f: pd.DataFrame) -> None:
             show(style_fig(fig, 330, legend=False))
         with t3:
             geo = f[f["Geo_Valid"]][["Drop_Latitude", "Drop_Longitude", "Delivery_Time"]]
-            geo = geo.sample(min(len(geo), 20000), random_state=5).rename(columns={"Drop_Latitude": "lat", "Drop_Longitude": "lon", "Delivery_Time": "t"})
-            if len(geo):
+            # Pre-aggregate drops into ~0.15° cells (≈15 km) so every column is an exact group mean.
+            cells = (geo.assign(lat=(geo["Drop_Latitude"] / 0.15).round() * 0.15,
+                                lon=(geo["Drop_Longitude"] / 0.15).round() * 0.15)
+                        .groupby(["lat", "lon"])["Delivery_Time"].agg(mean="mean", n="size").reset_index())
+            cells = cells[cells["n"] >= 5]
+            if len(cells):
+                lo, hi = cells["mean"].min(), cells["mean"].max()
+                ramp = np.array([[255, 225, 90], [255, 154, 115], [240, 97, 63], [184, 48, 30], [110, 20, 60]])
+                pos = ((cells["mean"] - lo) / max(hi - lo, 1e-9) * (len(ramp) - 1)).to_numpy()
+                i0 = np.floor(pos).astype(int).clip(0, len(ramp) - 2)
+                frac = (pos - i0)[:, None]
+                rgb = (ramp[i0] * (1 - frac) + ramp[i0 + 1] * frac).round().astype(int)
+                cells["color"] = [list(map(int, c)) + [235] for c in rgb]
+                cells["elev"] = (cells["mean"] - lo + 10) * 900
+                cells["mean_txt"] = cells["mean"].round(0).astype(int)
                 layer = pdk.Layer(
-                    "HexagonLayer", data=geo, get_position=["lon", "lat"], radius=9000,
-                    elevation_scale=60, elevation_range=[0, 3000], extruded=True, coverage=0.88, pickable=True,
-                    get_elevation_weight="t", elevation_aggregation="MEAN",
-                    get_color_weight="t", color_aggregation="MEAN",
-                    color_range=[[255, 241, 232], [255, 200, 174], [255, 154, 115], [240, 97, 63], [184, 48, 30], [120, 20, 40]],
+                    "ColumnLayer", data=cells[["lat", "lon", "elev", "color", "mean_txt", "n"]],
+                    get_position=["lon", "lat"], get_elevation="elev", elevation_scale=1, radius=7000,
+                    get_fill_color="color", extruded=True, pickable=True, auto_highlight=True, disk_resolution=6,
                 )
-                view = pdk.ViewState(latitude=21.5, longitude=79.0, zoom=3.9, pitch=52, bearing=-12)
+                view = pdk.ViewState(latitude=20.5, longitude=78.5, zoom=3.7, pitch=55, bearing=-15)
                 st.pydeck_chart(pdk.Deck(
                     layers=[layer], initial_view_state=view, map_provider="carto", map_style=pdk.map_styles.CARTO_LIGHT,
-                    tooltip={"html": "<b>{elevationValue}</b> min avg (column height)<br>{colorValue} min (colour)",
+                    tooltip={"html": "<b>{mean_txt} min</b> avg delivery<br>{n} orders in this cell",
                              "style": {"backgroundColor": NAVY, "color": "white", "fontFamily": "Archivo, sans-serif"}},
-                ), height=430)
-                st.caption("Hexagons over drop locations · height & colour = mean delivery time · drag with right-click to tilt.")
+                ), height=440)
+                st.caption(f"{len(cells):,} delivery cells (≥5 orders each) · column height & colour = mean delivery time "
+                           f"({lo:.0f}–{hi:.0f} min) · ctrl/right-drag to tilt.")
             else:
                 st.info("No valid coordinates in this selection.")
         r_all = f.groupby("Area")["Delivery_Time"].mean().sort_values()
