@@ -1,13 +1,13 @@
 [theme]
 base = "dark"
 primaryColor = "#FF7A45"
-backgroundColor = "#4B32C3"
-secondaryBackgroundColor = "#3A2799"
+backgroundColor = "#0A0A0C"
+secondaryBackgroundColor = "#1C1C22"
 textColor = "#FFFFFF"
 
 [theme.sidebar]
-backgroundColor = "#1E1B4B"
-secondaryBackgroundColor = "#2E2A6B"
+backgroundColor = "#141418"
+secondaryBackgroundColor = "#24242C"
 textColor = "#FFFFFF"
 
 [server]
