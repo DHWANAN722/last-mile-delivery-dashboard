@@ -185,7 +185,7 @@ html, body, [class*="css"], .stApp, .stMarkdown, button, input, textarea, select
 }}
 .hero .eyebrow {{ display: flex; justify-content: space-between; grid-column: 1 / -1;
   font: 800 12.5px/1 'JetBrains Mono', monospace; letter-spacing: .08em; }}
-.hero h1 {{ font: 900 clamp(44px, 6.2vw, 92px)/.88 {FONT}; letter-spacing: -.035em; margin: 6px 0 0; color: {NAVY}; padding: 0; }}
+.hero h1 {{ font: 900 clamp(38px, 4.6vw, 88px)/.88 {FONT}; letter-spacing: -.035em; margin: 6px 0 0; white-space: nowrap; color: {NAVY}; padding: 0; }}
 .hero h2 {{ font: 800 clamp(22px, 3vw, 40px)/1 {FONT}; margin: 12px 0 0; color: {NAVY}; padding: 0; letter-spacing: -.01em; }}
 .hero p.lede {{ font-size: 16px; line-height: 1.45; max-width: 520px; margin: 18px 0 0; font-weight: 500; }}
 .hero .art {{ background: {YELLOW}; border-radius: 22px; padding: 18px 18px 14px; box-shadow: 0 10px 0 rgba(30,27,75,.14); }}
