@@ -166,7 +166,7 @@ def inject_css() -> None:
 html, body, [class*="css"], .stApp, .stMarkdown, button, input, textarea, select {{
   font-family: {FONT};
 }}
-.stApp {{ background: {INDIGO}; }}
+.stApp {{ background: #0A0A0C; }}
 [data-testid="stHeader"] {{ background: transparent; }}
 .block-container {{ padding-top: 1.4rem; padding-bottom: 3rem; max-width: 1380px; }}
 
@@ -224,7 +224,7 @@ html, body, [class*="css"], .stApp, .stMarkdown, button, input, textarea, select
 /* ---------- chart cards (st.container key=card-*) ---------- */
 [class*="st-key-card-"] {{
   border-radius: 22px; padding: 20px 22px 20px; color: {NAVY};
-  box-shadow: 0 8px 0 rgba(20,14,70,.22);
+  box-shadow: 0 8px 0 rgba(255,255,255,.07);
 }}
 [class*="st-key-card-"] p, [class*="st-key-card-"] span, [class*="st-key-card-"] label,
 [class*="st-key-card-"] div[data-testid="stMarkdownContainer"] {{ color: {NAVY}; }}
